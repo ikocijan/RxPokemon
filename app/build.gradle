@@ -1,0 +1,122 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    def API_URL = 'API_URL'
+    def STRING = 'String'
+
+    defaultConfig {
+        applicationId "co.infinum.rxpokemon"
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField STRING, API_URL, '"https://pokeapi.infinum.co/"'
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        pickFirst 'META-INF/rxjava.properties'
+    }
+
+}
+
+project.ext {
+    support_lib = '25.1.0'
+    dagger = '2.8'
+    retrofit = '2.1.0'
+    okhttp = '3.5.0'
+    threetenabp = '1.0.4'
+    timber = '4.5.0'
+    butterknife = '8.4.0'
+    junit = '4.12'
+    mockito_version = '1.10.19'
+    moshi = '1.3.1'
+    moshi_json_api = '3.0.6'
+    glide = '3.7.0'
+    mjolnirRecyclerView = '1.5.1'
+    autovalue_version = '1.3'
+    rx_java = '2.0.5'
+    rx_android = '2.0.1'
+    rx_retrofit_adapter = '1.0.0'
+    constraint_layout = '1.0.0-beta4'
+}
+
+
+dependencies {
+    dependencies {
+        compile fileTree(dir: 'libs', include: ['*.jar'])
+
+        //support lib
+        compile "com.android.support:appcompat-v7:${support_lib}"
+        compile "com.android.support:recyclerview-v7:${support_lib}"
+        compile "com.android.support:design:${support_lib}"
+
+        //Constraint layout
+        compile "com.android.support.constraint:constraint-layout:${constraint_layout}"
+
+        //Timber
+        compile "com.jakewharton.timber:timber:${timber}"
+
+        //Retrofit
+        compile "com.squareup.retrofit2:retrofit:${retrofit}"
+
+        //Moshi
+        compile "com.squareup.moshi:moshi:${moshi}"
+        compile "com.squareup.retrofit2:converter-moshi:${retrofit}"
+        compile "com.squareup.retrofit2:converter-scalars:${retrofit}"
+        compile "moe.banana:moshi-jsonapi:${moshi_json_api}"
+
+        //OKHttp
+        compile "com.squareup.okhttp3:okhttp:${okhttp}"
+        compile "com.squareup.okhttp3:logging-interceptor:${okhttp}"
+        compile "com.squareup.okhttp3:okhttp-urlconnection:${okhttp}"
+
+        //Threeten
+        compile "com.jakewharton.threetenabp:threetenabp:${threetenabp}"
+
+        //Butterknife
+        compile "com.jakewharton:butterknife:${butterknife}"
+        annotationProcessor "com.jakewharton:butterknife-compiler:${butterknife}"
+
+        //dagger
+        compile "com.google.dagger:dagger:${dagger}"
+        annotationProcessor "com.google.dagger:dagger-compiler:${dagger}"
+        provided 'javax.annotation:jsr250-api:1.0'
+
+        //MjolnirRecyclerView
+        compile "co.infinum:mjolnirrecyclerview:${mjolnirRecyclerView}@aar"
+
+        //Glide
+        compile "com.github.bumptech.glide:glide:${glide}"
+
+        //Autovalue
+        provided "com.google.auto.value:auto-value:${autovalue_version}"
+        annotationProcessor "com.google.auto.value:auto-value:${autovalue_version}"
+
+        //Tests
+        testCompile "junit:junit:${junit}"
+        testCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+        testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+        testCompile "org.mockito:mockito-core:${mockito_version}"
+
+        //Rx
+        // libs like rxbinding + rxjava-math haven't been ported to RxJava 2.x yet, so this helps
+        compile "com.github.akarnokd:rxjava2-interop:0.9.0"
+        compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
+        compile "io.reactivex.rxjava2:rxjava:${rx_java}"
+        compile "io.reactivex.rxjava2:rxandroid:${rx_android}"
+        compile "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${rx_retrofit_adapter}"
+
+    }
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+}
