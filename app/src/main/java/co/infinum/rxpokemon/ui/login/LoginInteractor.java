@@ -4,6 +4,8 @@ import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
+import java.net.UnknownHostException;
+
 import javax.inject.Inject;
 
 import co.infinum.rxpokemon.data.model.param.LoginParams;
@@ -13,10 +15,13 @@ import co.infinum.rxpokemon.data.network.ApiService;
 import co.infinum.rxpokemon.data.network.Listener;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.BiPredicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class LoginInteractor implements LoginMvp.Interactor {
+
+    public static final int RETRY_COUNT = 1;
 
     CompositeDisposable disposables = new CompositeDisposable();
 
@@ -34,8 +39,21 @@ public class LoginInteractor implements LoginMvp.Interactor {
 
         reset();
 
-        apiService.loginUser(params).subscribeOn(Schedulers.io())
+        apiService.loginUser(params)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .retry(new BiPredicate<Integer, Throwable>() {
+                    @Override
+                    public boolean test(Integer integer, Throwable throwable) throws Exception {
+
+                        if (integer == RETRY_COUNT && throwable instanceof UnknownHostException) {
+                            return true;
+                        }
+
+                        return false;
+
+                    }
+                })
                 .subscribeWith(new DisposableObserver<LoginResponse>() {
                     @Override
                     public void onNext(LoginResponse loginResponse) {
