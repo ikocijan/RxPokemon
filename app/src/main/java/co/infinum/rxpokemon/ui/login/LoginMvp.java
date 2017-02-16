@@ -4,7 +4,6 @@ import co.infinum.rxpokemon.data.model.param.LoginParams;
 import co.infinum.rxpokemon.data.model.response.LoginResponse;
 import co.infinum.rxpokemon.data.network.Listener;
 import co.infinum.rxpokemon.ui.shared.BaseMvp;
-import io.reactivex.Flowable;
 
 public interface LoginMvp {
 
@@ -12,16 +11,14 @@ public interface LoginMvp {
 
         void setState(LoginViewState loginViewState);
 
-        void enableLogin(Boolean inputValid);
     }
 
     interface Presenter extends BaseMvp.Presenter {
 
-        void init(Flowable<CharSequence> emailChangeObserver, Flowable<CharSequence> passwordChangeObserver);
+        void init();
 
         void login(String username, String password);
 
-        void onDestroy();
     }
 
     interface Interactor extends BaseMvp.Interactor {

@@ -1,7 +1,5 @@
 package co.infinum.rxpokemon.ui.login;
 
-import com.jakewharton.rxbinding.widget.RxTextView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -17,8 +15,6 @@ import co.infinum.rxpokemon.dagger.component.AppComponent;
 import co.infinum.rxpokemon.ui.list.PokemonListActivity;
 import co.infinum.rxpokemon.ui.login.di.LoginModule;
 import co.infinum.rxpokemon.ui.shared.BaseActivity;
-import hu.akarnokd.rxjava.interop.RxJavaInterop;
-import io.reactivex.Flowable;
 
 public class LoginActivity extends BaseActivity implements LoginMvp.View {
 
@@ -34,26 +30,12 @@ public class LoginActivity extends BaseActivity implements LoginMvp.View {
     @BindView(R.id.btn_login)
     Button btnLogin;
 
-    private Flowable<CharSequence> emailChangeObservable;
-
-    private Flowable<CharSequence> passwordChangeObservable;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
-        btnLogin.setEnabled(false);
 
-        emailChangeObservable = RxJavaInterop.toV2Flowable(RxTextView
-                .textChanges(etEmail)
-                .skip(1));
-
-        passwordChangeObservable = RxJavaInterop.toV2Flowable(RxTextView
-                .textChanges(etPassword)
-                .skip(1));
-
-        presenter.init(emailChangeObservable, passwordChangeObservable);
+        presenter.init();
 
     }
 
@@ -97,11 +79,6 @@ public class LoginActivity extends BaseActivity implements LoginMvp.View {
 
     }
 
-    @Override
-    public void enableLogin(Boolean inputValid) {
-        btnLogin.setEnabled(inputValid);
-    }
-
     private void showPokemonList() {
         startActivity(new Intent(this, PokemonListActivity.class));
     }
@@ -114,7 +91,6 @@ public class LoginActivity extends BaseActivity implements LoginMvp.View {
 
     @Override
     protected void onDestroy() {
-        presenter.onDestroy();
         super.onDestroy();
     }
 }
