@@ -6,14 +6,15 @@ import com.squareup.moshi.Moshi;
 
 import javax.inject.Inject;
 
+import co.infinum.rxpokemon.dagger.annotations.IO;
+import co.infinum.rxpokemon.dagger.annotations.MainThread;
 import co.infinum.rxpokemon.data.model.User;
 import co.infinum.rxpokemon.data.model.param.LoginParams;
 import co.infinum.rxpokemon.data.model.response.ErrorResponse;
 import co.infinum.rxpokemon.data.model.response.LoginResponse;
-import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 
 public class LoginPresenter implements LoginMvp.Presenter {
 
@@ -25,11 +26,18 @@ public class LoginPresenter implements LoginMvp.Presenter {
 
     private Disposable loginDisposable;
 
+    private Scheduler ioScheduler;
+
+    private Scheduler mainThreadScheduler;
+
 
     @Inject
-    public LoginPresenter(LoginMvp.View view, LoginMvp.Interactor interactor) {
+    public LoginPresenter(LoginMvp.View view, LoginMvp.Interactor interactor, @IO Scheduler ioScheduler,
+            @MainThread Scheduler mainThreadScheduler) {
         this.view = view;
         this.interactor = interactor;
+        this.ioScheduler = ioScheduler;
+        this.mainThreadScheduler = mainThreadScheduler;
     }
 
     @Override
@@ -46,8 +54,8 @@ public class LoginPresenter implements LoginMvp.Presenter {
         LoginParams params = new LoginParams(username, password);
 
         loginDisposable = interactor.loginUser(params)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(ioScheduler)
+                .observeOn(mainThreadScheduler)
                 .retry(NUMBER_OF_RETRIES)
                 .subscribeWith(new DisposableObserver<LoginResponse>() {
                     @Override
