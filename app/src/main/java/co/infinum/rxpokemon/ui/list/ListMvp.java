@@ -1,8 +1,9 @@
 package co.infinum.rxpokemon.ui.list;
 
-import co.infinum.rxpokemon.data.model.PokemonResponse;
-import co.infinum.rxpokemon.data.network.Listener;
+import co.infinum.rxpokemon.data.model.Move;
+import co.infinum.rxpokemon.data.model.Pokemon;
 import co.infinum.rxpokemon.ui.shared.BaseMvp;
+import io.reactivex.Observable;
 
 public interface ListMvp {
 
@@ -18,7 +19,10 @@ public interface ListMvp {
 
     interface Interactor extends BaseMvp.Interactor {
 
-        void getPokemonListAndMoves(Listener<PokemonResponse> listener);
+        Observable<Pokemon[]> getPokemonList();
+
+        Observable<Move[]> getPokemonMoves();
+
     }
 
 }

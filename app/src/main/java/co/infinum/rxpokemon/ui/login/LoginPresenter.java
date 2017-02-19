@@ -48,11 +48,11 @@ public class LoginPresenter implements LoginMvp.Presenter {
     @Override
     public void login(String username, String password) {
 
-        cancel();
         view.setState(new LoginViewState(State.LOADING));
 
         LoginParams params = new LoginParams(username, password);
 
+        cancel();
         loginDisposable = interactor.loginUser(params)
                 .subscribeOn(ioScheduler)
                 .observeOn(mainThreadScheduler)
