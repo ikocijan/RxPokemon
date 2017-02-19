@@ -21,10 +21,7 @@ public interface LoginMvp {
 
     }
 
-    interface Interactor extends BaseMvp.Interactor {
-
-        Observable<LoginResponse> loginUser(LoginParams params);
-
+    interface Interactor extends BaseMvp.Interactor<LoginParams, Observable<LoginResponse>> {
     }
 
 

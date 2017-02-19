@@ -54,31 +54,6 @@ public class LoginActivity extends BaseActivity implements LoginMvp.View {
         presenter.login(etEmail.getText().toString(), etPassword.getText().toString());
     }
 
-
-    @Override
-    public void setState(LoginViewState loginViewState) {
-
-        switch (loginViewState.getState()) {
-            case State.LOADING:
-                showProgress();
-                break;
-
-            case State.LOGIN_COMPLETED:
-                hideProgress();
-                showPokemonList();
-                break;
-
-            case State.SHOW_MESSAGE:
-                hideProgress();
-                showMessage(loginViewState.getMessage());
-                break;
-
-            default:
-                break;
-        }
-
-    }
-
     private void showPokemonList() {
         startActivity(new Intent(this, PokemonListActivity.class));
     }
@@ -93,4 +68,28 @@ public class LoginActivity extends BaseActivity implements LoginMvp.View {
     protected void onDestroy() {
         super.onDestroy();
     }
+
+    @Override
+    public void setState(LoginViewState state) {
+        switch (state.getState()) {
+            case State.LOADING:
+                showProgress();
+                break;
+
+            case State.LOGIN_COMPLETED:
+                hideProgress();
+                showPokemonList();
+                break;
+
+            case State.SHOW_MESSAGE:
+                hideProgress();
+                showMessage(state.getMessage());
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
 }

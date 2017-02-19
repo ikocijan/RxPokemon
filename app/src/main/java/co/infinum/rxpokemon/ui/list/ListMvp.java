@@ -17,11 +17,11 @@ public interface ListMvp {
         void init();
     }
 
-    interface Interactor extends BaseMvp.Interactor {
+    interface ListInteractor extends BaseMvp.Interactor<Void, Observable<Pokemon[]>> {
 
-        Observable<Pokemon[]> getPokemonList();
+    }
 
-        Observable<Move[]> getPokemonMoves();
+    interface MovesInteractor extends BaseMvp.Interactor<Void, Observable<Move[]>> {
 
     }
 
