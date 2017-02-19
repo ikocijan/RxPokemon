@@ -2,8 +2,8 @@ package co.infinum.rxpokemon.ui.login;
 
 import co.infinum.rxpokemon.data.model.param.LoginParams;
 import co.infinum.rxpokemon.data.model.response.LoginResponse;
-import co.infinum.rxpokemon.data.network.Listener;
 import co.infinum.rxpokemon.ui.shared.BaseMvp;
+import io.reactivex.Observable;
 
 public interface LoginMvp {
 
@@ -23,7 +23,7 @@ public interface LoginMvp {
 
     interface Interactor extends BaseMvp.Interactor {
 
-        void loginUser(LoginParams params, Listener<LoginResponse> listener);
+        Observable<LoginResponse> loginUser(LoginParams params);
 
     }
 

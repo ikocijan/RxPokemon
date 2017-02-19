@@ -10,6 +10,7 @@ import co.infinum.rxpokemon.dagger.module.ConverterModule;
 import co.infinum.rxpokemon.dagger.module.DefaultExecutorsModule;
 import co.infinum.rxpokemon.dagger.module.HostModule;
 import co.infinum.rxpokemon.dagger.module.ProvidersModule;
+import co.infinum.rxpokemon.dagger.module.SchedulersModule;
 import co.infinum.rxpokemon.ui.list.di.PokemonListComponent;
 import co.infinum.rxpokemon.ui.list.di.PokemonListModule;
 import co.infinum.rxpokemon.ui.login.di.LoginComponent;
@@ -25,7 +26,8 @@ import dagger.Component;
         AppContextModule.class,
         ApiModule.class,
         ClientModule.class,
-        ProvidersModule.class
+        ProvidersModule.class,
+        SchedulersModule.class
 })
 @Singleton
 public interface AppComponent {

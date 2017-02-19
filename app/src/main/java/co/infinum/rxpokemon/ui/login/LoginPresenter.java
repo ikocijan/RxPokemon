@@ -1,23 +1,43 @@
 package co.infinum.rxpokemon.ui.login;
 
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+
 import javax.inject.Inject;
 
+import co.infinum.rxpokemon.dagger.annotations.IO;
+import co.infinum.rxpokemon.dagger.annotations.MainThread;
 import co.infinum.rxpokemon.data.model.User;
 import co.infinum.rxpokemon.data.model.param.LoginParams;
+import co.infinum.rxpokemon.data.model.response.ErrorResponse;
 import co.infinum.rxpokemon.data.model.response.LoginResponse;
-import co.infinum.rxpokemon.data.network.Listener;
+import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 public class LoginPresenter implements LoginMvp.Presenter {
+
+    public static final int NUMBER_OF_RETRIES = 1;
 
     private LoginMvp.View view;
 
     private LoginMvp.Interactor interactor;
 
+    private Disposable loginDisposable;
+
+    private Scheduler ioScheduler;
+
+    private Scheduler mainThreadScheduler;
+
 
     @Inject
-    public LoginPresenter(LoginMvp.View view, LoginMvp.Interactor interactor) {
+    public LoginPresenter(LoginMvp.View view, LoginMvp.Interactor interactor, @IO Scheduler ioScheduler,
+            @MainThread Scheduler mainThreadScheduler) {
         this.view = view;
         this.interactor = interactor;
+        this.ioScheduler = ioScheduler;
+        this.mainThreadScheduler = mainThreadScheduler;
     }
 
     @Override
@@ -28,31 +48,66 @@ public class LoginPresenter implements LoginMvp.Presenter {
     @Override
     public void login(String username, String password) {
 
+        cancel();
         view.setState(new LoginViewState(State.LOADING));
 
         LoginParams params = new LoginParams(username, password);
 
-        interactor.loginUser(params, new Listener<LoginResponse>() {
-            @Override
-            public void onSuccess(LoginResponse result) {
+        loginDisposable = interactor.loginUser(params)
+                .subscribeOn(ioScheduler)
+                .observeOn(mainThreadScheduler)
+                .retry(NUMBER_OF_RETRIES)
+                .subscribeWith(new DisposableObserver<LoginResponse>() {
+                    @Override
+                    public void onNext(LoginResponse loginResponse) {
+                        User.getInstance().setEmail(loginResponse.getEmail());
+                        User.getInstance().setAuthToken(loginResponse.getAuthToken());
+                        view.setState(new LoginViewState(State.LOGIN_COMPLETED));
+                    }
 
-                User.getInstance().setEmail(result.getEmail());
-                User.getInstance().setAuthToken(result.getAuthToken());
-                view.setState(new LoginViewState(State.LOGIN_COMPLETED));
+                    @Override
+                    public void onError(Throwable e) {
 
-            }
+                        //TODO will be fixed
+                        String error = "Login error";
 
-            @Override
-            public void onFailure(String error) {
-                view.setState(new LoginViewState(error, State.SHOW_MESSAGE));
-            }
-        });
+                        if (e instanceof HttpException) {
+
+                            try {
+
+                                Moshi moshi = new Moshi.Builder()
+                                        .build();
+
+                                String errorJson = ((HttpException) e).response().errorBody().string();
+                                JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
+                                ErrorResponse errorResponse = errorResponseJsonAdapter.fromJson(errorJson);
+
+                                error = errorResponse.getErrorList().get(0).getDetail();
+
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+
+                        }
+
+                        view.setState(new LoginViewState(error, State.SHOW_MESSAGE));
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
 
     }
 
     @Override
     public void cancel() {
-        interactor.cancel();
+
+        if (loginDisposable != null && !loginDisposable.isDisposed()) {
+            loginDisposable.dispose();
+        }
+
     }
 
 }

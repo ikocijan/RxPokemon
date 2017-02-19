@@ -1,32 +1,13 @@
 package co.infinum.rxpokemon.ui.login;
 
-import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
-
-import java.net.UnknownHostException;
-
 import javax.inject.Inject;
 
 import co.infinum.rxpokemon.data.model.param.LoginParams;
-import co.infinum.rxpokemon.data.model.response.ErrorResponse;
 import co.infinum.rxpokemon.data.model.response.LoginResponse;
 import co.infinum.rxpokemon.data.network.ApiService;
-import co.infinum.rxpokemon.data.network.Listener;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.BiPredicate;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.Observable;
 
 public class LoginInteractor implements LoginMvp.Interactor {
-
-    public static final int RETRY_COUNT = 1;
-
-    CompositeDisposable disposables = new CompositeDisposable();
-
-    private boolean isCanceled = false;
-
     private ApiService apiService;
 
     @Inject
@@ -35,75 +16,16 @@ public class LoginInteractor implements LoginMvp.Interactor {
     }
 
     @Override
-    public void loginUser(LoginParams params, final Listener<LoginResponse> listener) {
-
-        reset();
-
-        apiService.loginUser(params)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry(new BiPredicate<Integer, Throwable>() {
-                    @Override
-                    public boolean test(Integer integer, Throwable throwable) throws Exception {
-
-                        if (integer == RETRY_COUNT && throwable instanceof UnknownHostException) {
-                            return true;
-                        }
-
-                        return false;
-
-                    }
-                })
-                .subscribeWith(new DisposableObserver<LoginResponse>() {
-                    @Override
-                    public void onNext(LoginResponse loginResponse) {
-                        listener.onSuccess(loginResponse);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                        String error = "Login error";
-
-                        if (e instanceof HttpException) {
-
-                            try {
-
-                                Moshi moshi = new Moshi.Builder()
-                                        .build();
-
-                                String errorJson = ((HttpException) e).response().errorBody().string();
-                                JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
-                                ErrorResponse errorResponse = errorResponseJsonAdapter.fromJson(errorJson);
-
-                                error = errorResponse.getErrorList().get(0).getDetail();
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-
-                        }
-
-                        listener.onFailure(error);
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-
+    public Observable<LoginResponse> loginUser(LoginParams params) {
+        return apiService.loginUser(params);
     }
 
     @Override
     public void cancel() {
-        isCanceled = true;
     }
 
     @Override
     public void reset() {
-        isCanceled = false;
     }
 
 }
