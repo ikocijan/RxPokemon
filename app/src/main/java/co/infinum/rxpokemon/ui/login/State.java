@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @IntDef({})
-@interface State {
+public @interface State {
 
     int LOADING = 0;
     int SHOW_MESSAGE = 1;

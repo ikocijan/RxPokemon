@@ -17,6 +17,15 @@ public final class LoginResponse extends Resource{
     @Json(name = "auth-token")
     private String authToken;
 
+    public LoginResponse(String email, String password, String authToken) {
+        this.email = email;
+        this.password = password;
+        this.authToken = authToken;
+    }
+
+    public LoginResponse() {
+    }
+
     public String getEmail() {
         return email;
     }
