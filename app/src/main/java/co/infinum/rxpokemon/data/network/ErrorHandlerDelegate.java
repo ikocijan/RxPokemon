@@ -4,13 +4,13 @@ import co.infinum.rxpokemon.R;
 import co.infinum.rxpokemon.shared.interfaces.StringProvider;
 import co.infinum.rxpokemon.ui.shared.BaseMvp;
 
-public class RxErrorHandlerDelegate implements ErrorHandler {
+public class ErrorHandlerDelegate implements ErrorHandler {
 
     private final BaseMvp.View view;
 
     private final StringProvider stringProvider;
 
-    public RxErrorHandlerDelegate(BaseMvp.View view, StringProvider stringProvider) {
+    public ErrorHandlerDelegate(BaseMvp.View view, StringProvider stringProvider) {
         this.view = view;
         this.stringProvider = stringProvider;
     }

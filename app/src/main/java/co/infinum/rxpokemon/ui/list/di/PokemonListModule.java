@@ -1,7 +1,7 @@
 package co.infinum.rxpokemon.ui.list.di;
 
 import co.infinum.rxpokemon.data.network.ErrorHandler;
-import co.infinum.rxpokemon.data.network.RxErrorHandlerDelegate;
+import co.infinum.rxpokemon.data.network.ErrorHandlerDelegate;
 import co.infinum.rxpokemon.shared.interfaces.StringProvider;
 import co.infinum.rxpokemon.ui.list.ListMvp;
 import co.infinum.rxpokemon.ui.list.PokemonListInteractor;
@@ -41,6 +41,6 @@ public class PokemonListModule {
 
     @Provides
     public ErrorHandler provideErrorHandler(StringProvider stringProvider) {
-        return new RxErrorHandlerDelegate(view, stringProvider);
+        return new ErrorHandlerDelegate(view, stringProvider);
     }
 }

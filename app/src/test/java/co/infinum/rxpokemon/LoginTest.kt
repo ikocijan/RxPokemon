@@ -2,7 +2,7 @@ package co.infinum.rxpokemon
 
 import co.infinum.rxpokemon.data.model.response.LoginResponse
 import co.infinum.rxpokemon.data.network.ErrorHandler
-import co.infinum.rxpokemon.data.network.RxErrorHandlerDelegate
+import co.infinum.rxpokemon.data.network.ErrorHandlerDelegate
 import co.infinum.rxpokemon.shared.interfaces.StringProvider
 import co.infinum.rxpokemon.ui.login.*
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
@@ -55,7 +55,7 @@ class LoginTest {
             }
         }
 
-        errorHandler = RxErrorHandlerDelegate(view, stringProvider)
+        errorHandler = ErrorHandlerDelegate(view, stringProvider)
         presenter = LoginPresenter(view, interactor, immediateScheduler, immediateScheduler, errorHandler)
         Mockito.`when`(stringProvider.getString(Mockito.anyInt())).thenReturn("#yolo")
 
