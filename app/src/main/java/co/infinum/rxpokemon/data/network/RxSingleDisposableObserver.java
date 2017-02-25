@@ -1,11 +1,11 @@
 package co.infinum.rxpokemon.data.network;
 
-import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 
 import io.reactivex.SingleObserver;
+import retrofit2.HttpException;
 
 public abstract class RxSingleDisposableObserver<T> implements SingleObserver<T> {
 

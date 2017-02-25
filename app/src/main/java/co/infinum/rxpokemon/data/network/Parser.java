@@ -1,10 +1,10 @@
 package co.infinum.rxpokemon.data.network;
 
-import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
 import co.infinum.rxpokemon.data.model.response.ErrorResponse;
+import retrofit2.HttpException;
 
 public final class Parser {
 
