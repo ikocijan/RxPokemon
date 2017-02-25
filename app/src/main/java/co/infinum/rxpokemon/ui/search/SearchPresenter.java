@@ -12,6 +12,7 @@ import co.infinum.rxpokemon.data.model.Pokemon;
 import co.infinum.rxpokemon.data.network.ErrorHandler;
 import co.infinum.rxpokemon.data.network.RxDisposableObserver;
 import co.infinum.rxpokemon.data.network.RxSingleDisposableObserver;
+import co.infinum.rxpokemon.shared.SimpleObservable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -26,6 +27,8 @@ public class SearchPresenter implements SearchMvp.Presenter {
 
     private ErrorHandler errorHandler;
 
+    private SimpleObservable<String> searchObservable = new SimpleObservable<>();
+
     @Inject
     public SearchPresenter(SearchMvp.View view, ErrorHandler errorHandler) {
         this.view = view;
@@ -34,10 +37,10 @@ public class SearchPresenter implements SearchMvp.Presenter {
 
 
     @Override
-    public void init(Observable<CharSequence> searchViewObservable, List<Pokemon> pokemons) {
+    public void init(List<Pokemon> pokemons) {
         this.pokemonList = pokemons;
 
-        searchViewObservable
+        searchObservable
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .filter(new Predicate<CharSequence>() {
                     @Override
@@ -59,8 +62,11 @@ public class SearchPresenter implements SearchMvp.Presenter {
                 });
     }
 
-
     @Override
+    public void onSearchChanged(String newText) {
+        searchObservable.emit(newText);
+    }
+
     public void search(final String query) {
 
         Observable

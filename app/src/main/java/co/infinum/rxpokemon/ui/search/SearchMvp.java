@@ -4,7 +4,6 @@ import java.util.List;
 
 import co.infinum.rxpokemon.data.model.Pokemon;
 import co.infinum.rxpokemon.ui.shared.BaseMvp;
-import io.reactivex.Observable;
 
 public interface SearchMvp {
 
@@ -15,9 +14,9 @@ public interface SearchMvp {
 
     interface Presenter extends BaseMvp.Presenter {
 
-        void search(String query);
+        void init(List<Pokemon> pokemons);
 
-        void init(Observable<CharSequence> searchViewObservable, List<Pokemon> pokemons);
+        void onSearchChanged(String newText);
     }
 
 
