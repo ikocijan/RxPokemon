@@ -9,12 +9,13 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import co.infinum.rxpokemon.data.model.Pokemon;
+import co.infinum.rxpokemon.data.network.ErrorHandler;
+import co.infinum.rxpokemon.data.network.RxDisposableObserver;
+import co.infinum.rxpokemon.data.network.RxSingleDisposableObserver;
 import io.reactivex.Observable;
-import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Predicate;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class SearchPresenter implements SearchMvp.Presenter {
@@ -23,9 +24,12 @@ public class SearchPresenter implements SearchMvp.Presenter {
 
     private SearchMvp.View view;
 
+    private ErrorHandler errorHandler;
+
     @Inject
-    public SearchPresenter(SearchMvp.View view) {
+    public SearchPresenter(SearchMvp.View view, ErrorHandler errorHandler) {
         this.view = view;
+        this.errorHandler = errorHandler;
     }
 
 
@@ -42,15 +46,10 @@ public class SearchPresenter implements SearchMvp.Presenter {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<CharSequence>() {
+                .subscribeWith(new RxDisposableObserver<CharSequence>(errorHandler) {
                     @Override
                     public void onNext(CharSequence charSequence) {
                         search(charSequence.toString());
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
                     }
 
                     @Override
@@ -75,7 +74,7 @@ public class SearchPresenter implements SearchMvp.Presenter {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toList()
-                .subscribeWith(new SingleObserver<List<Pokemon>>() {
+                .subscribeWith(new RxSingleDisposableObserver<List<Pokemon>>(errorHandler) {
                     @Override
                     public void onSubscribe(Disposable d) {
                         view.setViewState(new PokemonSearchViewState(State.LOADING));
@@ -84,11 +83,6 @@ public class SearchPresenter implements SearchMvp.Presenter {
                     @Override
                     public void onSuccess(List<Pokemon> pokemons) {
                         view.setViewState(new PokemonSearchViewState(State.SHOW_POKEMON_LIST, pokemons));
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
                     }
                 });
 

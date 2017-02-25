@@ -5,13 +5,13 @@ import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.SingleObserver;
 
-public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
+public abstract class RxSingleDisposableObserver<T> implements SingleObserver<T> {
 
     private ErrorHandler errorHandler;
 
-    public RxDisposableObserver(ErrorHandler errorHandler) {
+    protected RxSingleDisposableObserver(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
     }
 
@@ -25,7 +25,6 @@ public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
         } else {
             onUnknownError(e);
         }
-
     }
 
     /**
@@ -47,8 +46,11 @@ public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
      * Override for different behaviour
      */
     protected void onUnauthorized(Throwable e) {
+
         String error = Parser.parseErrorResponse(e);
         errorHandler.onError(error);
+
+
     }
 
 }
