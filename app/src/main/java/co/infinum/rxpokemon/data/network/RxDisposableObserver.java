@@ -68,7 +68,7 @@ public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
             ex.printStackTrace();
         }
 
-        errorHandler.onUnauthorized(error);
+        errorHandler.onError(error);
 
 
     }

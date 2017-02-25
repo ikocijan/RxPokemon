@@ -7,5 +7,5 @@ public interface ErrorHandler {
 
     void onNetworkError();
 
-    void onUnauthorized(String message);
+    void onError(String message);
 }

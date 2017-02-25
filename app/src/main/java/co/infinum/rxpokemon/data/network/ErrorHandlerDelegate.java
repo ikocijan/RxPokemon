@@ -29,7 +29,7 @@ public class ErrorHandlerDelegate implements ErrorHandler {
     }
 
     @Override
-    public void onUnauthorized(String message) {
+    public void onError(String message) {
         view.hideProgress();
         view.showMessage(message);
     }
