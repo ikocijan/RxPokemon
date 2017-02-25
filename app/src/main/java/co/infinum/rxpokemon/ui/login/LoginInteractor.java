@@ -1,5 +1,6 @@
 package co.infinum.rxpokemon.ui.login;
 
+
 import javax.inject.Inject;
 
 import co.infinum.rxpokemon.data.model.param.LoginParams;
@@ -8,6 +9,7 @@ import co.infinum.rxpokemon.data.network.ApiService;
 import io.reactivex.Observable;
 
 public class LoginInteractor implements LoginMvp.Interactor {
+
     private ApiService apiService;
 
     @Inject
@@ -15,17 +17,10 @@ public class LoginInteractor implements LoginMvp.Interactor {
         this.apiService = apiService;
     }
 
+
     @Override
-    public Observable<LoginResponse> loginUser(LoginParams params) {
+    public Observable<LoginResponse> execute(LoginParams params) {
         return apiService.loginUser(params);
-    }
 
-    @Override
-    public void cancel() {
     }
-
-    @Override
-    public void reset() {
-    }
-
 }

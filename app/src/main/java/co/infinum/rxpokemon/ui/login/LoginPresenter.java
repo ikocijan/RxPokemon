@@ -1,20 +1,16 @@
 package co.infinum.rxpokemon.ui.login;
 
-import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
-
 import javax.inject.Inject;
 
 import co.infinum.rxpokemon.dagger.annotations.IO;
 import co.infinum.rxpokemon.dagger.annotations.MainThread;
 import co.infinum.rxpokemon.data.model.User;
 import co.infinum.rxpokemon.data.model.param.LoginParams;
-import co.infinum.rxpokemon.data.model.response.ErrorResponse;
 import co.infinum.rxpokemon.data.model.response.LoginResponse;
+import co.infinum.rxpokemon.data.network.ErrorHandler;
+import co.infinum.rxpokemon.data.network.RxDisposableObserver;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
 
 public class LoginPresenter implements LoginMvp.Presenter {
 
@@ -30,14 +26,17 @@ public class LoginPresenter implements LoginMvp.Presenter {
 
     private Scheduler mainThreadScheduler;
 
+    private ErrorHandler errorHandler;
+
 
     @Inject
     public LoginPresenter(LoginMvp.View view, LoginMvp.Interactor interactor, @IO Scheduler ioScheduler,
-            @MainThread Scheduler mainThreadScheduler) {
+            @MainThread Scheduler mainThreadScheduler, ErrorHandler errorHandler) {
         this.view = view;
         this.interactor = interactor;
         this.ioScheduler = ioScheduler;
         this.mainThreadScheduler = mainThreadScheduler;
+        this.errorHandler = errorHandler;
     }
 
     @Override
@@ -50,54 +49,29 @@ public class LoginPresenter implements LoginMvp.Presenter {
 
         view.setState(new LoginViewState(State.LOADING));
 
-        LoginParams params = new LoginParams(username, password);
+        final LoginParams params = new LoginParams(username, password);
 
         cancel();
-        loginDisposable = interactor.loginUser(params)
-                .subscribeOn(ioScheduler)
-                .observeOn(mainThreadScheduler)
-                .retry(NUMBER_OF_RETRIES)
-                .subscribeWith(new DisposableObserver<LoginResponse>() {
-                    @Override
-                    public void onNext(LoginResponse loginResponse) {
-                        User.getInstance().setEmail(loginResponse.getEmail());
-                        User.getInstance().setAuthToken(loginResponse.getAuthToken());
-                        view.setState(new LoginViewState(State.LOGIN_COMPLETED));
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
+        loginDisposable =
+                interactor.execute(params)
+                        .subscribeOn(ioScheduler)
+                        .observeOn(mainThreadScheduler)
+                        .retry(NUMBER_OF_RETRIES)
+                        .subscribeWith(new RxDisposableObserver<LoginResponse>(errorHandler) {
 
-                        //TODO will be fixed
-                        String error = "Login error";
-
-                        if (e instanceof HttpException) {
-
-                            try {
-
-                                Moshi moshi = new Moshi.Builder()
-                                        .build();
-
-                                String errorJson = ((HttpException) e).response().errorBody().string();
-                                JsonAdapter<ErrorResponse> errorResponseJsonAdapter = moshi.adapter(ErrorResponse.class);
-                                ErrorResponse errorResponse = errorResponseJsonAdapter.fromJson(errorJson);
-
-                                error = errorResponse.getErrorList().get(0).getDetail();
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
+                            @Override
+                            public void onNext(LoginResponse loginResponse) {
+                                User.getInstance().setEmail(loginResponse.getEmail());
+                                User.getInstance().setAuthToken(loginResponse.getAuthToken());
+                                view.setState(new LoginViewState(State.LOGIN_COMPLETED));
                             }
 
-                        }
+                            @Override
+                            public void onComplete() {
 
-                        view.setState(new LoginViewState(error, State.SHOW_MESSAGE));
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                            }
+                        });
 
     }
 

@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "source": {
+        "pointer": "/data/attributes/email"
+      },
+      "detail": "invalid email or password"
+    }
+  ]
+}

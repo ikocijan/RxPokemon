@@ -1,5 +1,7 @@
 package co.infinum.rxpokemon.ui.shared;
 
+import io.reactivex.Observable;
+
 public interface BaseMvp {
 
     interface View {
@@ -17,11 +19,9 @@ public interface BaseMvp {
         void cancel();
     }
 
-    interface Interactor {
+    interface Interactor<RequestParams, Response extends Observable> {
 
-        void cancel();
-
-        void reset();
+        Response execute(RequestParams requestParams);
 
     }
 }

@@ -1,8 +1,12 @@
 package co.infinum.rxpokemon.ui.list.di;
 
+import co.infinum.rxpokemon.data.network.ErrorHandler;
+import co.infinum.rxpokemon.data.network.ErrorHandlerDelegate;
+import co.infinum.rxpokemon.shared.interfaces.StringProvider;
 import co.infinum.rxpokemon.ui.list.ListMvp;
 import co.infinum.rxpokemon.ui.list.PokemonListInteractor;
 import co.infinum.rxpokemon.ui.list.PokemonListPresenter;
+import co.infinum.rxpokemon.ui.list.PokemonMovesInteractor;
 import dagger.Module;
 import dagger.Provides;
 
@@ -26,8 +30,17 @@ public class PokemonListModule {
     }
 
     @Provides
-    public ListMvp.Interactor provideInteractor(PokemonListInteractor interactor) {
+    public ListMvp.ListInteractor provideListInteractor(PokemonListInteractor interactor) {
         return interactor;
     }
 
+    @Provides
+    public ListMvp.MovesInteractor provideMovesInteractor(PokemonMovesInteractor interactor) {
+        return interactor;
+    }
+
+    @Provides
+    public ErrorHandler provideErrorHandler(StringProvider stringProvider) {
+        return new ErrorHandlerDelegate(view, stringProvider);
+    }
 }
