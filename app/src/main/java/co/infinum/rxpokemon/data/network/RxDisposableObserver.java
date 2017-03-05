@@ -1,19 +1,34 @@
 package co.infinum.rxpokemon.data.network;
 
 
+import android.support.annotation.Nullable;
+
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 import retrofit2.HttpException;
 
 public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
 
-    private ErrorHandler errorHandler;
+    private final ErrorHandler errorHandler;
+
+    @Nullable
+    private final CompositeDisposable compositeDisposable;
 
     public RxDisposableObserver(ErrorHandler errorHandler) {
-        this.errorHandler = errorHandler;
+        this(errorHandler, null);
     }
+
+    public RxDisposableObserver(ErrorHandler errorHandler, @Nullable CompositeDisposable compositeDisposable) {
+        this.errorHandler = errorHandler;
+        this.compositeDisposable = compositeDisposable;
+        if (this.compositeDisposable != null) {
+            this.compositeDisposable.add(this);
+        }
+    }
+
 
     @Override
     public void onError(Throwable e) {

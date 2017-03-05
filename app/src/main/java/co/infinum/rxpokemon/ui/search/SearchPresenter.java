@@ -15,6 +15,7 @@ import co.infinum.rxpokemon.data.network.RxSingleDisposableObserver;
 import co.infinum.rxpokemon.shared.SimpleObservable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
@@ -28,6 +29,8 @@ public class SearchPresenter implements SearchMvp.Presenter {
     private ErrorHandler errorHandler;
 
     private SimpleObservable<String> searchObservable = new SimpleObservable<>();
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Inject
     public SearchPresenter(SearchMvp.View view, ErrorHandler errorHandler) {
@@ -49,7 +52,7 @@ public class SearchPresenter implements SearchMvp.Presenter {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new RxDisposableObserver<CharSequence>(errorHandler) {
+                .subscribeWith(new RxDisposableObserver<CharSequence>(errorHandler, compositeDisposable) {
                     @Override
                     public void onNext(CharSequence charSequence) {
                         search(charSequence.toString());
@@ -80,7 +83,7 @@ public class SearchPresenter implements SearchMvp.Presenter {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toList()
-                .subscribeWith(new RxSingleDisposableObserver<List<Pokemon>>(errorHandler) {
+                .subscribeWith(new RxSingleDisposableObserver<List<Pokemon>>(errorHandler, compositeDisposable) {
                     @Override
                     public void onSubscribe(Disposable d) {
                         view.setViewState(new PokemonSearchViewState(State.LOADING));
@@ -97,7 +100,9 @@ public class SearchPresenter implements SearchMvp.Presenter {
 
     @Override
     public void cancel() {
-
+        if (compositeDisposable != null && compositeDisposable.isDisposed()) {
+            compositeDisposable.clear();
+        }
     }
 
 }

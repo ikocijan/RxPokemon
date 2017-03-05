@@ -10,7 +10,7 @@ import co.infinum.rxpokemon.data.model.response.LoginResponse;
 import co.infinum.rxpokemon.data.network.ErrorHandler;
 import co.infinum.rxpokemon.data.network.RxDisposableObserver;
 import io.reactivex.Scheduler;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class LoginPresenter implements LoginMvp.Presenter {
 
@@ -20,7 +20,7 @@ public class LoginPresenter implements LoginMvp.Presenter {
 
     private LoginMvp.Interactor interactor;
 
-    private Disposable loginDisposable;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private Scheduler ioScheduler;
 
@@ -51,35 +51,33 @@ public class LoginPresenter implements LoginMvp.Presenter {
 
         final LoginParams params = new LoginParams(username, password);
 
-        cancel();
+        interactor.execute(params)
+                .subscribeOn(ioScheduler)
+                .observeOn(mainThreadScheduler)
+                .retry(NUMBER_OF_RETRIES)
+                .subscribeWith(new RxDisposableObserver<LoginResponse>(errorHandler, compositeDisposable) {
 
-        loginDisposable =
-                interactor.execute(params)
-                        .subscribeOn(ioScheduler)
-                        .observeOn(mainThreadScheduler)
-                        .retry(NUMBER_OF_RETRIES)
-                        .subscribeWith(new RxDisposableObserver<LoginResponse>(errorHandler) {
+                    @Override
+                    public void onNext(LoginResponse loginResponse) {
+                        User.getInstance().setEmail(loginResponse.getEmail());
+                        User.getInstance().setAuthToken(loginResponse.getAuthToken());
+                        view.setState(new LoginViewState(State.LOGIN_COMPLETED));
+                    }
 
-                            @Override
-                            public void onNext(LoginResponse loginResponse) {
-                                User.getInstance().setEmail(loginResponse.getEmail());
-                                User.getInstance().setAuthToken(loginResponse.getAuthToken());
-                                view.setState(new LoginViewState(State.LOGIN_COMPLETED));
-                            }
 
-                            @Override
-                            public void onComplete() {
+                    @Override
+                    public void onComplete() {
 
-                            }
-                        });
+                    }
+                });
+
 
     }
 
     @Override
     public void cancel() {
-
-        if (loginDisposable != null && !loginDisposable.isDisposed()) {
-            loginDisposable.dispose();
+        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
+            compositeDisposable.clear();
         }
 
     }

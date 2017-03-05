@@ -39,7 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseMvp.
 
     @Override
     public void hideProgress() {
-        progressDialog.hide();
+        progressDialog.dismiss();
     }
 
     @Override

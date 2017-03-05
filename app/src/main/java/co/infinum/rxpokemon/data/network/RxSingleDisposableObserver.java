@@ -1,18 +1,38 @@
 package co.infinum.rxpokemon.data.network;
 
 
+import android.support.annotation.Nullable;
+
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 
 import io.reactivex.SingleObserver;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import retrofit2.HttpException;
 
 public abstract class RxSingleDisposableObserver<T> implements SingleObserver<T> {
 
-    private ErrorHandler errorHandler;
+    private final ErrorHandler errorHandler;
+
+    @Nullable
+    private final CompositeDisposable compositeDisposable;
 
     protected RxSingleDisposableObserver(ErrorHandler errorHandler) {
+        this(errorHandler, null);
+    }
+
+
+    protected RxSingleDisposableObserver(ErrorHandler errorHandler, @Nullable CompositeDisposable compositeDisposable) {
         this.errorHandler = errorHandler;
+        this.compositeDisposable = compositeDisposable;
+    }
+
+    @Override
+    public void onSubscribe(Disposable d) {
+        if (compositeDisposable != null) {
+            compositeDisposable.add(d);
+        }
     }
 
     @Override

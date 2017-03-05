@@ -12,7 +12,7 @@ import co.infinum.rxpokemon.data.network.ErrorHandler;
 import co.infinum.rxpokemon.data.network.RxDisposableObserver;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -20,7 +20,6 @@ import timber.log.Timber;
 
 public class PokemonListPresenter implements ListMvp.Presenter {
 
-    private Disposable rxDisposable;
 
     private ListMvp.View view;
 
@@ -29,6 +28,9 @@ public class PokemonListPresenter implements ListMvp.Presenter {
     private ListMvp.MovesInteractor movesInteractor;
 
     private ErrorHandler errorHandler;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
 
     @Inject
     public PokemonListPresenter(ListMvp.View view, ListMvp.ListInteractor listInteractor, ListMvp.MovesInteractor movesInteractor,
@@ -66,12 +68,12 @@ public class PokemonListPresenter implements ListMvp.Presenter {
                             }
                         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
 
-        rxDisposable = Observable.zip(pokemonListObservable, movesObservable, new BiFunction<List<Pokemon>, List<Move>, PokemonResponse>() {
+        Observable.zip(pokemonListObservable, movesObservable, new BiFunction<List<Pokemon>, List<Move>, PokemonResponse>() {
             @Override
             public PokemonResponse apply(List<Pokemon> pokemons, List<Move> moves) throws Exception {
                 return new PokemonResponse(moves, pokemons);
             }
-        }).subscribeWith(new RxDisposableObserver<PokemonResponse>(errorHandler) {
+        }).subscribeWith(new RxDisposableObserver<PokemonResponse>(errorHandler, compositeDisposable) {
 
             @Override
             public void onNext(PokemonResponse pokemonResponse) {
@@ -93,8 +95,8 @@ public class PokemonListPresenter implements ListMvp.Presenter {
     @Override
     public void cancel() {
 
-        if (rxDisposable != null && !rxDisposable.isDisposed()) {
-            rxDisposable.dispose();
+        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
+            compositeDisposable.clear();
         }
 
     }
