@@ -1,7 +1,5 @@
 package co.infinum.rxpokemon.ui.search;
 
-import com.jakewharton.rxbinding.widget.RxSearchView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,8 +23,6 @@ import co.infinum.rxpokemon.data.model.Pokemon;
 import co.infinum.rxpokemon.ui.search.di.SearchModule;
 import co.infinum.rxpokemon.ui.shared.BaseActivity;
 import co.infinum.rxpokemon.ui.shared.PokemonListAdapter;
-import hu.akarnokd.rxjava.interop.RxJavaInterop;
-import io.reactivex.Observable;
 
 public class SearchPokemonActivity extends BaseActivity implements SearchMvp.View {
 
@@ -62,12 +58,21 @@ public class SearchPokemonActivity extends BaseActivity implements SearchMvp.Vie
         pokemonListAdapter = new PokemonListAdapter(this, Collections.<Pokemon>emptyList(), null);
         rvPokemon.setAdapter(pokemonListAdapter);
 
-        Observable<CharSequence> searchViewObservable =
-                RxJavaInterop.toV2Observable(RxSearchView.queryTextChanges(searchView));
-
         List<Pokemon> pokemons = getIntent().getParcelableArrayListExtra(EXTRA_POKEMON_LIST);
 
-        presenter.init(searchViewObservable, pokemons);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                presenter.onSearchChanged(newText);
+                return false;
+            }
+        });
+        presenter.init(pokemons);
 
     }
 

@@ -1,7 +1,5 @@
 package co.infinum.rxpokemon.dagger.module;
 
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-
 import java.util.concurrent.Executor;
 
 import javax.inject.Named;
@@ -13,6 +11,7 @@ import dagger.Provides;
 import okhttp3.OkHttpClient;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 @Module
 public class ApiModule {
@@ -27,8 +26,8 @@ public class ApiModule {
             @Named(Constants.CALLBACK_EXECUTOR) Executor callbackExecutor,
             @Named(Constants.JSON_API_CONVERTER) Converter.Factory jsonApiConverter) {
         Retrofit.Builder builder = new Retrofit.Builder()
-                .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .baseUrl(baseUrl)
                 .addConverterFactory(jsonApiConverter)
                 .client(client);
 

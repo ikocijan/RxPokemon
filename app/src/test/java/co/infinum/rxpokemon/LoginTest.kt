@@ -5,7 +5,6 @@ import co.infinum.rxpokemon.data.network.ErrorHandler
 import co.infinum.rxpokemon.data.network.ErrorHandlerDelegate
 import co.infinum.rxpokemon.shared.interfaces.StringProvider
 import co.infinum.rxpokemon.ui.login.*
-import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
 import io.reactivex.Observable.error
 import io.reactivex.Observable.just
 import io.reactivex.Scheduler
@@ -20,6 +19,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnit
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.InputStreamReader
 import java.net.HttpURLConnection

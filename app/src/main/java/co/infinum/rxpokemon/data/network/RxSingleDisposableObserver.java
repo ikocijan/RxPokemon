@@ -6,29 +6,34 @@ import android.support.annotation.Nullable;
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 
+import io.reactivex.SingleObserver;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.disposables.Disposable;
 import retrofit2.HttpException;
 
-public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
+public abstract class RxSingleDisposableObserver<T> implements SingleObserver<T> {
 
     private final ErrorHandler errorHandler;
 
     @Nullable
     private final CompositeDisposable compositeDisposable;
 
-    public RxDisposableObserver(ErrorHandler errorHandler) {
+    protected RxSingleDisposableObserver(ErrorHandler errorHandler) {
         this(errorHandler, null);
     }
 
-    public RxDisposableObserver(ErrorHandler errorHandler, @Nullable CompositeDisposable compositeDisposable) {
+
+    protected RxSingleDisposableObserver(ErrorHandler errorHandler, @Nullable CompositeDisposable compositeDisposable) {
         this.errorHandler = errorHandler;
         this.compositeDisposable = compositeDisposable;
-        if (this.compositeDisposable != null) {
-            this.compositeDisposable.add(this);
-        }
     }
 
+    @Override
+    public void onSubscribe(Disposable d) {
+        if (compositeDisposable != null) {
+            compositeDisposable.add(d);
+        }
+    }
 
     @Override
     public void onError(Throwable e) {
@@ -40,7 +45,6 @@ public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
         } else {
             onUnknownError(e);
         }
-
     }
 
     /**
@@ -62,8 +66,11 @@ public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
      * Override for different behaviour
      */
     protected void onUnauthorized(Throwable e) {
+
         String error = Parser.parseErrorResponse(e);
         errorHandler.onError(error);
+
+
     }
 
 }
