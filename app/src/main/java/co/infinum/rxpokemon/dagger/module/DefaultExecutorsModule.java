@@ -6,10 +6,10 @@ import android.os.Looper;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
-import co.infinum.rxpokemon.shared.Constants;
+import co.infinum.rxpokemon.dagger.annotations.CallbackExecutor;
+import co.infinum.rxpokemon.dagger.annotations.HttpExecutor;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Dispatcher;
@@ -21,14 +21,14 @@ public class DefaultExecutorsModule {
 
     @Provides
     @Singleton
-    @Named(Constants.HTTP_EXECUTOR)
+    @HttpExecutor
     public Executor provideHttpExecutor() {
         return Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     }
 
     @Provides
     @Singleton
-    @Named(Constants.CALLBACK_EXECUTOR)
+    @CallbackExecutor
     public Executor provideCallbackExecutor() {
         return new MainThreadExecutor();
     }

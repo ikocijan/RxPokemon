@@ -9,7 +9,7 @@ import co.infinum.rxpokemon.data.model.Move;
 import co.infinum.rxpokemon.data.model.Pokemon;
 import co.infinum.rxpokemon.data.model.PokemonResponse;
 import co.infinum.rxpokemon.data.network.ErrorHandler;
-import co.infinum.rxpokemon.data.network.RxDisposableObserver;
+import co.infinum.rxpokemon.shared.RxDisposableObserver;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;

@@ -8,7 +8,7 @@ import co.infinum.rxpokemon.data.model.User;
 import co.infinum.rxpokemon.data.model.param.LoginParams;
 import co.infinum.rxpokemon.data.model.response.LoginResponse;
 import co.infinum.rxpokemon.data.network.ErrorHandler;
-import co.infinum.rxpokemon.data.network.RxDisposableObserver;
+import co.infinum.rxpokemon.shared.RxDisposableObserver;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 

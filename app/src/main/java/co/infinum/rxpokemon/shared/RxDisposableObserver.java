@@ -1,4 +1,4 @@
-package co.infinum.rxpokemon.data.network;
+package co.infinum.rxpokemon.shared;
 
 
 import android.support.annotation.Nullable;
@@ -6,34 +6,31 @@ import android.support.annotation.Nullable;
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 
-import io.reactivex.SingleObserver;
+import co.infinum.rxpokemon.data.network.ErrorHandler;
+import co.infinum.rxpokemon.data.network.Parser;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import retrofit2.HttpException;
 
-public abstract class RxSingleDisposableObserver<T> implements SingleObserver<T> {
+public abstract class RxDisposableObserver<T> extends DisposableObserver<T> {
 
     private final ErrorHandler errorHandler;
 
     @Nullable
     private final CompositeDisposable compositeDisposable;
 
-    protected RxSingleDisposableObserver(ErrorHandler errorHandler) {
+    public RxDisposableObserver(ErrorHandler errorHandler) {
         this(errorHandler, null);
     }
 
-
-    protected RxSingleDisposableObserver(ErrorHandler errorHandler, @Nullable CompositeDisposable compositeDisposable) {
+    public RxDisposableObserver(ErrorHandler errorHandler, @Nullable CompositeDisposable compositeDisposable) {
         this.errorHandler = errorHandler;
         this.compositeDisposable = compositeDisposable;
-    }
-
-    @Override
-    public void onSubscribe(Disposable d) {
-        if (compositeDisposable != null) {
-            compositeDisposable.add(d);
+        if (this.compositeDisposable != null) {
+            this.compositeDisposable.add(this);
         }
     }
+
 
     @Override
     public void onError(Throwable e) {
@@ -45,6 +42,7 @@ public abstract class RxSingleDisposableObserver<T> implements SingleObserver<T>
         } else {
             onUnknownError(e);
         }
+
     }
 
     /**
@@ -66,11 +64,8 @@ public abstract class RxSingleDisposableObserver<T> implements SingleObserver<T>
      * Override for different behaviour
      */
     protected void onUnauthorized(Throwable e) {
-
         String error = Parser.parseErrorResponse(e);
         errorHandler.onError(error);
-
-
     }
 
 }

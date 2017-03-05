@@ -2,10 +2,10 @@ package co.infinum.rxpokemon.dagger.module;
 
 import java.util.concurrent.Executor;
 
-import javax.inject.Named;
-
+import co.infinum.rxpokemon.dagger.annotations.ApiUrl;
+import co.infinum.rxpokemon.dagger.annotations.CallbackExecutor;
+import co.infinum.rxpokemon.dagger.annotations.JsonApiConverter;
 import co.infinum.rxpokemon.data.network.ApiService;
-import co.infinum.rxpokemon.shared.Constants;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -22,9 +22,9 @@ public class ApiModule {
     }
 
     @Provides
-    public Retrofit provideRetrofit(OkHttpClient client, @Named(Constants.API_URL) String baseUrl,
-            @Named(Constants.CALLBACK_EXECUTOR) Executor callbackExecutor,
-            @Named(Constants.JSON_API_CONVERTER) Converter.Factory jsonApiConverter) {
+    public Retrofit provideRetrofit(OkHttpClient client, @ApiUrl String baseUrl,
+            @CallbackExecutor Executor callbackExecutor,
+            @JsonApiConverter Converter.Factory jsonApiConverter) {
         Retrofit.Builder builder = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(baseUrl)

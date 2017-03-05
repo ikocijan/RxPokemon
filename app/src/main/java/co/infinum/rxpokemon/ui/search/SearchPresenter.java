@@ -10,8 +10,8 @@ import javax.inject.Inject;
 
 import co.infinum.rxpokemon.data.model.Pokemon;
 import co.infinum.rxpokemon.data.network.ErrorHandler;
-import co.infinum.rxpokemon.data.network.RxDisposableObserver;
-import co.infinum.rxpokemon.data.network.RxSingleDisposableObserver;
+import co.infinum.rxpokemon.shared.RxDisposableObserver;
+import co.infinum.rxpokemon.shared.RxSingleDisposableObserver;
 import co.infinum.rxpokemon.shared.SimpleObservable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;

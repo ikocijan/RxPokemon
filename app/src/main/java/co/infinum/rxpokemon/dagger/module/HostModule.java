@@ -1,10 +1,9 @@
 package co.infinum.rxpokemon.dagger.module;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import co.infinum.rxpokemon.BuildConfig;
-import co.infinum.rxpokemon.shared.Constants;
+import co.infinum.rxpokemon.dagger.annotations.ApiUrl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -20,7 +19,7 @@ public class HostModule {
     }
 
     @Provides
-    @Named(Constants.API_URL)
+    @ApiUrl
     public String provideBaseUrl() {
         return BuildConfig.API_URL;
     }
