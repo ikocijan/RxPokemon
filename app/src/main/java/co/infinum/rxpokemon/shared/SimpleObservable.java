@@ -23,7 +23,7 @@ public class SimpleObservable<T> extends Observable<T> {
 
             @Override
             public boolean isDisposed() {
-                return observers.contains(observer);
+                return !observers.contains(observer);
             }
         });
     }
