@@ -51,6 +51,7 @@ public class SearchPresenter implements SearchMvp.Presenter {
                         return !TextUtils.isEmpty(charSequence) && charSequence.length() > 3;
                     }
                 })
+                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new RxDisposableObserver<CharSequence>(errorHandler, compositeDisposable) {
                     @Override
